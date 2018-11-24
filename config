@@ -1,0 +1,174 @@
+# vim:filetype=i3
+# Should you change your keyboard layout some time, delete
+# this file and re-run i3-config-wizard(1).
+
+# Expected to be symlinked to ~/.config/i3/config
+
+# i3 config file (v4)
+# Please see http://i3wm.org/docs/userguide.html for a complete reference!
+
+###--- Settings---###
+set $mod Mod1
+set $sup Mod4
+set $urxvt
+
+set $innergap 10
+set $outergap 10
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+
+# Almost solely used in case of nagbar
+font pango: xos4 Terminus 12
+
+# Do not follow the mouse
+focus_follows_mouse no
+
+# Window border
+for_window [class="^.*"] border pixel 0
+
+# Setup gaps
+gaps inner $innergap
+gaps outer $outergap
+
+###--- i3 coloring ---###
+
+set_from_resource $fg i3wm.color7 #f0f0f0
+set_from_resource $bg i3wm.color2 #f0f0f0
+
+# class                 border  backgr. text indicator child_border
+client.focused          $bg     $bg     $fg  $bg       $bg
+;client.focused_inactive $bg     $bg     $fg  $bg       $bg
+;client.unfocused        $bg     $bg     $fg  $bg       $bg
+;client.urgent           $bg     $bg     $fg  $bg       $bg
+;client.placeholder      $bg     $bg     $fg  $bg       $bg
+
+client.background       $bg
+
+###--- Window bindings / Focus ---###
+
+###--- i3 navigation binds ---###
+# change focus - vim style
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+# move focused window - vim style
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+
+# split in horizontal orientation
+bindsym $mod+backslash split h
+
+# split in vertical orientation
+bindsym $mod+BackSpace split v
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen toggle
+
+# change container layout (stacked, tabbed, toggle split)
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+
+# toggle tiling / floating
+bindsym $mod+t floating toggle
+
+# toggle / untoggle gaps
+# see https://www.reddit.com/r/i3wm/comments/5e593j/script_to_toggle_gaps_on_and_off/
+# to make this into a single command
+bindsym $mod+Shift+g gaps inner current set 0; gaps outer current set 0
+bindsym $mod+g gaps inner current set $innergap; gaps outer current set $outergap
+
+# open an empty container
+bindsym $mod+o open
+
+# change focus between tiling / floating windows
+bindsym $mod+Shift+t focus mode_toggle
+
+bindsym $mod+Escape		workspace prev
+bindsym $mod+Shift+grave exec i3-msg exit
+
+# Kill all focused windows with Control+q
+bindsym $mod+q kill
+
+###--- Launch Applications Binds ---###
+bindsym $mod+Return exec urxvt
+bindsym $mod+Tab exec --no-startup-id rofi -show run
+
+###--- Command Keybindings ---###
+# focus the parent container
+bindsym $mod+a focus parent
+
+#switch to workspace
+bindsym $mod+1 workspace 1
+bindsym $mod+2 workspace 2
+bindsym $mod+3 workspace 3
+bindsym $mod+4 workspace 4
+bindsym $mod+5 workspace 5
+bindsym $mod+6 workspace 6
+bindsym $mod+7 workspace 7
+bindsym $mod+8 workspace 8
+bindsym $mod+9 workspace 9
+bindsym $mod+0 workspace 10
+
+#move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace 1
+bindsym $mod+Shift+2 move container to workspace 2
+bindsym $mod+Shift+3 move container to workspace 3
+bindsym $mod+Shift+4 move container to workspace 4
+bindsym $mod+Shift+5 move container to workspace 5
+bindsym $mod+Shift+6 move container to workspace 6
+bindsym $mod+Shift+7 move container to workspace 7
+bindsym $mod+Shift+8 move container to workspace 8
+bindsym $mod+Shift+9 move container to workspace 9
+bindsym $mod+Shift+0 move container to workspace 10
+
+# reload the configuration file
+bindsym $mod+Shift+c reload
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+
+# Resize keybinds
+bindsym $mod+plus resize grow width 10 px or 10 ppt
+bindsym $mod+Shift+plus resize grow height 10 px or 10 ppt
+bindsym $mod+minus resize shrink width 10 px or 10 ppt
+bindsym $mod+Shift+minus resize shrink height 10 px or 10 ppt
+
+# Rofi keybinds
+bindsym $mod+m exec sh ~/scripts/rofi.sh run
+bindsym $mod+Shift+m exec sh ~/scripts/rofi.sh window
+
+# Lock screen
+bindsym $sup+l exec --no-startup-id sh ~/scripts/lock.sh
+
+###--- scripts ran at start ---###
+exec  --no-startup-id feh --bg-fill ~/Wallpapers/Synth.jpg
+exec wal -i ~/Wallpapers/Synth.jpg
+exec compton
+exec --no-startup-id xrandr --auto --output DP-4 --mode 1920x1080 --rate 144
+xrdb -merge ~/.Xresources
+xrandr --dpi 94
+# Merged nvidia monitor setup with nitrogen as nitrogen won't restore properly till screens are setup
+# Nvidia setup instead of xrandr is to include fix for screen tearing with X and Nvidia proprietary driver
+exec --no-startup-id sh ~/scripts/nvidia.sh; nitrogen --restore
+# Restore wallpaper setup
+#exec --no-startup-id nitrogen --restore
+# Wal, dunst and polybar combined - waiting for wal values first
+# Currently wait a bit before executing due to a known bug
+# https://bbs.archlinux.org/viewtopic.php?id=200797
+# Modify sleep time from machine to machine
+exec --no-startup-id sleep 2; sh ~/scripts/beautify.sh
+###--- Launch Applications/Daemons At Start ---###
+# Dropbox won't seem to start without a delay - tray issue
+
+# Start Mopidy Server
+exec --no-startup-id mopidy
+
+###--- Input settings (mouse/keyboard) ---####
+# Reduce mouse speed by 0%
+exec --no-startup-id xinput --set-prop 9 'libinput Accel Speed' -1
+#exec --no-startup-id xinput --set-prop 9 'libinput Accel Speed' -1
